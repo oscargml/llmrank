@@ -48,7 +48,13 @@ Respond with ONLY this JSON format (no markdown, no other text):
       }
     );
 
-    const text = response.data.content[0]?.text || '';
+    const text =
+      response.data.completion ||
+      response.data.output?.[0]?.content?.[0]?.text ||
+      response.data.content?.[0]?.text ||
+      response.data.choices?.[0]?.message?.content ||
+      '';
+
     console.log('Claude response:', text);
     return parseMetricsFromResponse(text);
   } catch (error) {
