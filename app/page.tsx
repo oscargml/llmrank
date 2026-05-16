@@ -2,266 +2,292 @@
 
 import { useState } from 'react';
 import LLMRank from './components/LLMRank';
-import { ChevronDown, Search, BarChart3, Zap, Brain, Globe } from 'lucide-react';
+import { ChevronDown, ArrowRight, Zap, Brain, BarChart3, Globe } from 'lucide-react';
 
 export default function Home() {
   const [showTool, setShowTool] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
-  const faqs = [
+  const articles = [
     {
-      q: "What's the difference between LLMRank and Semrush?",
-      a: "Semrush focuses on traditional SEO metrics (keywords, backlinks, SERP positions). LLMRank is specialized for LLM-era SEO—measuring how well your content ranks for AI models, ChatGPT, Claude, and RAG systems. While Semrush optimizes for Google search, LLMRank optimizes for the future of search where AI reads and cites your content.",
+      title: 'How AI Models Choose Content: The Citation Game',
+      excerpt: 'ChatGPT, Claude, and Gemini pick sources based on semantic clarity and trustworthiness, not keyword density. Learn what actually matters.',
+      category: 'SEO Strategy',
+      readTime: '5 min',
     },
     {
-      q: "How does LLMRank differ from AnswerThePublic?",
-      a: "AnswerThePublic shows questions people search for. LLMRank analyzes whether your content would be selected by LLMs when answering those questions. We measure semantic clarity, citation worthiness, and training value—metrics that matter for AI model ranking.",
+      title: 'Semantic Clarity: The New SEO Metric That Matters',
+      excerpt: 'Traditional keyword rankings are dying. How to structure content so LLMs understand (and cite) your work automatically.',
+      category: 'LLM Optimization',
+      readTime: '7 min',
     },
     {
-      q: "Can I use LLMRank with Semrush and AnswerThePublic together?",
-      a: "Yes! Use AnswerThePublic to find high-intent keywords, Semrush to track Google rankings, and LLMRank to optimize your content for AI. This three-part approach ensures your content ranks for both traditional search and AI-powered systems.",
+      title: 'Training Data Quality Score: Will Your Content Be Used for AI Training?',
+      excerpt: 'Not all content is created equal for LLM training. The metrics that determine if your work becomes part of future AI models.',
+      category: 'AI Training',
+      readTime: '6 min',
     },
     {
-      q: "What's 'semantic clarity' and why does it matter?",
-      a: "Semantic clarity measures how well an LLM can understand your content's meaning without relying on keywords. Well-structured topics, clear entity relationships, and logical flow all boost semantic clarity. This is more important for LLM ranking than keyword density.",
-    },
-    {
-      q: "How does LLMRank calculate the training value score?",
-      a: "Training value assesses whether your content is suitable for fine-tuning LLMs. We evaluate citation quality, factual accuracy, structured data, and information density. High-quality, well-sourced content scores higher.",
-    },
-    {
-      q: "Will LLMRank replace traditional SEO tools?",
-      a: "No—LLMRank complements traditional SEO. As AI becomes the primary interface for information discovery, you'll need both Google rankings AND LLM rankings. Forward-thinking SEO strategies now include both tools.",
+      title: 'Semrush vs LLMRank: The Future of Content Strategy',
+      excerpt: 'How to use traditional SEO tools and LLM-optimized tools together for maximum visibility in AI and search.',
+      category: 'Tools',
+      readTime: '8 min',
     },
   ];
 
-  const features = [
+  const faqs = [
     {
-      icon: Brain,
-      title: 'LLM-Specific Metrics',
-      description: 'Measures how AI models perceive your content—semantic clarity, citation worthiness, and training value.',
+      q: 'Do I need API keys to use LLMRank?',
+      a: 'Yes. LLMRank uses real APIs (Claude, PageSpeed, SerpAPI) to analyze your content. You can get free tier keys from each service. Instructions are shown in the app when you click "Analyze Your Website".',
     },
     {
-      icon: BarChart3,
-      title: 'Competitor Analysis',
-      description: 'Compare your LLM rankings against competitors and discover the gaps you need to close.',
+      q: 'How is LLMRank different from Semrush AI SEO?',
+      a: 'Semrush AI SEO helps write content optimized for Google. LLMRank analyzes how well your content ranks for ChatGPT, Claude, and other LLMs. Use both: Semrush for Google rankings + LLMRank for AI rankings.',
     },
     {
-      icon: Zap,
-      title: 'Real-Time Scoring',
-      description: 'Instant analysis powered by Claude API. Get actionable insights for immediate improvements.',
+      q: 'What APIs do I need?',
+      a: 'Anthropic Claude (required - for LLM analysis), Google PageSpeed (optional - for performance), SerpAPI (optional - for keyword tracking), Wappalyzer (optional - for tech detection). All have free tiers.',
     },
     {
-      icon: Globe,
-      title: 'Multi-API Integration',
-      description: 'Combines Wappalyzer, PageSpeed, SerpAPI, and Claude for comprehensive analysis.',
+      q: 'Can I use this without entering API keys?',
+      a: 'The app will work but show estimated/default metrics instead of real analysis. To get accurate LLM scores, you need at least the Anthropic API key.',
+    },
+    {
+      q: 'Is this a replacement for Semrush?',
+      a: 'No. Use Semrush for Google SEO (keywords, rankings, backlinks). Use LLMRank for AI SEO (LLM citations, semantic clarity, training value). They complement each other.',
+    },
+    {
+      q: 'Who should use LLMRank?',
+      a: 'Content creators, SEO professionals, and businesses that want their content cited by AI models. As AI becomes the primary interface for search, this becomes essential.',
     },
   ];
+
+  if (showTool) {
+    return <LLMRank />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-6 py-20 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
+      {/* Hero Section - Compact */}
+      <section className="min-h-[80vh] flex items-center justify-center px-6 py-20 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-15">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}} />
         </div>
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-            Rank for the AI Era
+        <div className="relative z-10 max-w-2xl mx-auto text-center">
+          <div className="inline-block mb-4 px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 rounded-full">
+            <p className="text-cyan-300 text-sm font-semibold">The Future of SEO is Here</p>
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Rank for AI,<br />Not Just Google
           </h1>
-          <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
-            LLMRank analyzes how ChatGPT, Claude, and other AI models perceive your content. Optimize for LLM ranking, RAG systems, and semantic search—not just Google.
+
+          <p className="text-lg text-slate-300 mb-8 leading-relaxed">
+            ChatGPT, Claude, and Gemini are becoming the primary interface for information discovery. LLMRank shows how well your content ranks for AI models—and how to improve it.
           </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => setShowTool(true)}
+              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-slate-950 font-bold rounded-lg transition-all hover:shadow-lg hover:shadow-cyan-500/50 flex items-center justify-center gap-2"
+            >
+              Analyze Your Website Free <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({behavior: 'smooth'})}
+              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg transition-all"
+            >
+              Learn More
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* The Problem - Why This Matters */}
+      <section className="max-w-5xl mx-auto px-6 py-20" id="how-it-works">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">60%</div>
+            <p className="text-slate-300 text-sm">
+              Of knowledge workers use AI daily for research and decision-making
+            </p>
+          </div>
+          <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">85%</div>
+            <p className="text-slate-300 text-sm">
+              Of AI responses cite the top 3 sources. Being cited = authority
+            </p>
+          </div>
+          <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">3x</div>
+            <p className="text-slate-300 text-sm">
+              Revenue increase for content cited by ChatGPT vs non-cited content
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* LLMRank vs Semrush - Key Differentiator */}
+      <section className="max-w-5xl mx-auto px-6 py-20 bg-gradient-to-r from-slate-900/50 to-slate-800/50 rounded-lg border border-slate-700 my-12">
+        <h2 className="text-3xl font-bold mb-8 text-center">LLMRank + Semrush = Complete Content Strategy</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 className="text-lg font-bold text-slate-300 mb-4">Semrush Optimizes For:</h3>
+            <ul className="space-y-2 text-slate-400">
+              <li>✓ Google keyword rankings</li>
+              <li>✓ Backlink profiles</li>
+              <li>✓ Keyword difficulty/volume</li>
+              <li>✓ Competitor SERP positions</li>
+              <li>✓ On-page SEO basics</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-cyan-400 mb-4">LLMRank Optimizes For:</h3>
+            <ul className="space-y-2 text-cyan-300">
+              <li>✓ LLM citation probability</li>
+              <li>✓ Semantic clarity & structure</li>
+              <li>✓ Training data quality</li>
+              <li>✓ AI model understanding</li>
+              <li>✓ RAG system compatibility</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/70 rounded-lg p-6 border border-slate-700 text-center">
+          <p className="text-slate-300 font-semibold">
+            <span className="text-cyan-400">Use Semrush</span> to rank on Google. <span className="text-cyan-400">Use LLMRank</span> to rank in AI. <br/>
+            Do both and your content gets discovered everywhere.
+          </p>
+        </div>
+      </section>
+
+      {/* Articles/Blog Section */}
+      <section className="max-w-5xl mx-auto px-6 py-20">
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-2">Resources & Insights</h2>
+          <p className="text-slate-400">Understand how AI ranking works and how to optimize your content</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {articles.map((article, idx) => (
+            <article key={idx} className="bg-slate-900 border border-slate-800 rounded-lg p-6 hover:border-cyan-500/50 transition-all cursor-pointer">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full">
+                  {article.category}
+                </span>
+                <span className="text-xs text-slate-500">{article.readTime}</span>
+              </div>
+              <h3 className="text-lg font-bold mb-2">{article.title}</h3>
+              <p className="text-slate-400 text-sm">{article.excerpt}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Getting Started */}
+      <section className="max-w-3xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-8 text-center">How to Use LLMRank</h2>
+
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 flex gap-4">
+            <div className="text-2xl font-bold text-cyan-400 w-12 h-12 flex items-center justify-center bg-cyan-500/20 rounded">1</div>
+            <div>
+              <h3 className="font-bold mb-2">Enter Your Website URL</h3>
+              <p className="text-slate-400 text-sm">Paste any URL to analyze. LLMRank will fetch the page content and analyze it.</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 flex gap-4">
+            <div className="text-2xl font-bold text-cyan-400 w-12 h-12 flex items-center justify-center bg-cyan-500/20 rounded">2</div>
+            <div>
+              <h3 className="font-bold mb-2">Add Your API Keys (Optional)</h3>
+              <p className="text-slate-400 text-sm">Get free API keys from Anthropic, Google, SerpAPI. Instructions shown in the app. Without keys, you'll see estimated metrics.</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 flex gap-4">
+            <div className="text-2xl font-bold text-cyan-400 w-12 h-12 flex items-center justify-center bg-cyan-500/20 rounded">3</div>
+            <div>
+              <h3 className="font-bold mb-2">Get Real LLM Scores</h3>
+              <p className="text-slate-400 text-sm">See how AI models rate your content. Semantic clarity, citation worthiness, training value, and actionable recommendations.</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-6 flex gap-4">
+            <div className="text-2xl font-bold text-cyan-400 w-12 h-12 flex items-center justify-center bg-cyan-500/20 rounded">4</div>
+            <div>
+              <h3 className="font-bold mb-2">Optimize & Republish</h3>
+              <p className="text-slate-400 text-sm">Follow the ranking guide to improve scores. Better semantic clarity, more citations, stronger structure = higher AI rankings.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12 text-center">
           <button
             onClick={() => setShowTool(true)}
             className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-slate-950 font-bold rounded-lg text-lg transition-all hover:shadow-lg hover:shadow-cyan-500/50"
           >
-            Analyze Your Website Free
+            Start Analyzing →
           </button>
         </div>
       </section>
 
-      {/* Features Grid */}
-      {!showTool && (
-        <>
-          <section className="max-w-7xl mx-auto px-6 py-20">
-            <h2 className="text-4xl font-bold mb-12 text-center">Why LLMRank?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {features.map((feature, i) => {
-                const Icon = feature.icon;
-                return (
-                  <div key={i} className="bg-slate-900 border border-slate-800 rounded-lg p-8 hover:border-cyan-500/50 transition-all">
-                    <Icon className="w-12 h-12 text-cyan-400 mb-4" />
-                    <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                    <p className="text-slate-300">{feature.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+      {/* FAQ */}
+      <section className="max-w-3xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold mb-12 text-center">FAQ</h2>
 
-          {/* The AI Search Trend */}
-          <section className="max-w-7xl mx-auto px-6 py-20 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-lg border border-cyan-500/30 my-12">
-            <h2 className="text-3xl font-bold mb-6">The Shift to AI-Powered Search</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div>
-                <div className="text-4xl font-bold text-cyan-400 mb-2">85%</div>
-                <p className="text-slate-300">Of companies now use AI for customer-facing decisions</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-cyan-400 mb-2">60%</div>
-                <p className="text-slate-300">Of users expect AI to be integrated into search by 2025</p>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-cyan-400 mb-2">2X</div>
-                <p className="text-slate-300">Revenue increase for content cited by LLMs</p>
-              </div>
-            </div>
-          </section>
-
-          {/* LLMRank vs Semrush vs AnswerThePublic */}
-          <section className="max-w-7xl mx-auto px-6 py-20">
-            <h2 className="text-3xl font-bold mb-12 text-center">LLMRank vs Traditional SEO Tools</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px]">
-                <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="px-6 py-4 text-left font-semibold text-cyan-400">Feature</th>
-                    <th className="px-6 py-4 text-center font-semibold">LLMRank</th>
-                    <th className="px-6 py-4 text-center font-semibold">Semrush</th>
-                    <th className="px-6 py-4 text-center font-semibold">AnswerThePublic</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-slate-700">
-                    <td className="px-6 py-4 font-medium">LLM Citation Score</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                  </tr>
-                  <tr className="border-b border-slate-700">
-                    <td className="px-6 py-4 font-medium">Google Rankings</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                  </tr>
-                  <tr className="border-b border-slate-700">
-                    <td className="px-6 py-4 font-medium">Semantic Clarity Analysis</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                  </tr>
-                  <tr className="border-b border-slate-700">
-                    <td className="px-6 py-4 font-medium">Question Discovery</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                  </tr>
-                  <tr className="border-b border-slate-700">
-                    <td className="px-6 py-4 font-medium">Training Data Quality</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-medium">Backlink Analysis</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                    <td className="px-6 py-4 text-center text-green-400">✓</td>
-                    <td className="px-6 py-4 text-center text-slate-400">✗</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* How to Use LLMRank with Other Tools */}
-          <section className="max-w-7xl mx-auto px-6 py-20">
-            <h2 className="text-3xl font-bold mb-12">The Winning SEO Strategy: Combining All Tools</h2>
-            <div className="space-y-6">
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-                <h3 className="text-xl font-bold mb-3 text-cyan-400">Step 1: Find High-Intent Questions (AnswerThePublic)</h3>
-                <p className="text-slate-300 mb-4">
-                  Use AnswerThePublic to discover what people actually ask about your topic. Questions like "What is LLMRank?" or "How do I optimize for AI search?" reveal true user intent.
-                </p>
-                <p className="text-sm text-slate-400">Why: Real questions = real search volume + real traffic</p>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-                <h3 className="text-xl font-bold mb-3 text-cyan-400">Step 2: Create Answer-Focused Content</h3>
-                <p className="text-slate-300 mb-4">
-                  Write articles that thoroughly answer those questions. Include semantic markers: clear structure, entity linking, citations, and logical flow. This is where LLMRank comes in.
-                </p>
-                <p className="text-sm text-slate-400">Why: LLMs select content that comprehensively answers questions</p>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-                <h3 className="text-xl font-bold mb-3 text-cyan-400">Step 3: Verify LLM Compatibility (LLMRank)</h3>
-                <p className="text-slate-300 mb-4">
-                  Analyze your content with LLMRank to ensure it scores well on semantic clarity, citation worthiness, and training value. Make adjustments before publishing.
-                </p>
-                <p className="text-sm text-slate-400">Why: Pre-validation prevents publishing content that LLMs won't cite</p>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-                <h3 className="text-xl font-bold mb-3 text-cyan-400">Step 4: Track Google Rankings & Distribution (Semrush)</h3>
-                <p className="text-slate-300 mb-4">
-                  Monitor SERP positions, backlinks, and competitive visibility. Semrush tracks the "old SEO" signals that still matter for Google.
-                </p>
-                <p className="text-sm text-slate-400">Why: Google + AI signals together = maximum reach</p>
-              </div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section className="max-w-4xl mx-auto px-6 py-20">
-            <h2 className="text-3xl font-bold mb-12 text-center">Frequently Asked Questions</h2>
-            <div className="space-y-4">
-              {faqs.map((faq, idx) => (
-                <div key={idx} className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden hover:border-cyan-500/50 transition-all">
-                  <button
-                    onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                    className="w-full px-6 py-4 flex items-center justify-between font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
-                  >
-                    {faq.q}
-                    <ChevronDown
-                      className={`w-5 h-5 transition-transform ${expandedFAQ === idx ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-                  {expandedFAQ === idx && (
-                    <div className="px-6 py-4 text-slate-300 border-t border-slate-800">
-                      {faq.a}
-                    </div>
-                  )}
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => (
+            <div key={idx} className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden hover:border-cyan-500/50 transition-all">
+              <button
+                onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
+                className="w-full px-6 py-4 flex items-center justify-between font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                {faq.q}
+                <ChevronDown
+                  className={`w-5 h-5 transition-transform ${expandedFAQ === idx ? 'rotate-180' : ''}`}
+                />
+              </button>
+              {expandedFAQ === idx && (
+                <div className="px-6 py-4 text-slate-300 border-t border-slate-800">
+                  {faq.a}
                 </div>
-              ))}
+              )}
             </div>
-          </section>
-
-          {/* CTA */}
-          <section className="max-w-3xl mx-auto px-6 py-20 text-center">
-            <h2 className="text-4xl font-bold mb-6">Ready to Optimize for the AI Era?</h2>
-            <p className="text-xl text-slate-300 mb-8">
-              Analyze your website for LLM ranking today. It takes less than a minute.
-            </p>
-            <button
-              onClick={() => setShowTool(true)}
-              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-slate-950 font-bold rounded-lg text-lg transition-all hover:shadow-lg hover:shadow-cyan-500/50"
-            >
-              Start Free Analysis
-            </button>
-          </section>
-        </>
-      )}
-
-      {/* Tool Section */}
-      {showTool && <LLMRank />}
+          ))}
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
-          <p>LLMRank © 2026 | Optimizing content for the future of search</p>
+      <footer className="bg-slate-900 border-t border-slate-800 py-12 px-6 mt-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 className="font-bold mb-4">LLMRank</h3>
+              <p className="text-slate-400 text-sm">Optimize content for AI models and LLM ranking</p>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Resources</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><a href="#" className="hover:text-cyan-400">Blog</a></li>
+                <li><a href="#" className="hover:text-cyan-400">Documentation</a></li>
+                <li><a href="#" className="hover:text-cyan-400">API Docs</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Legal</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><a href="#" className="hover:text-cyan-400">Privacy</a></li>
+                <li><a href="#" className="hover:text-cyan-400">Terms</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-700 pt-8 text-center text-slate-400 text-sm">
+            <p>LLMRank © 2026 | Optimizing for the AI era of search</p>
+          </div>
         </div>
       </footer>
     </div>
