@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const SERP_API_KEY = process.env.SERP_API_KEY;
+type SerpOrganicResult = {
+  position?: number;
+  title?: string;
+  snippet?: string;
+};
 
 export async function analyzeSERPPositions(url: string) {
-  if (!SERP_API_KEY) {
+  const apiKey = process.env.SERP_API_KEY;
+
+  if (!apiKey) {
     return getDefaultSERPData();
   }
 
@@ -12,15 +18,15 @@ export async function analyzeSERPPositions(url: string) {
     const response = await axios.get('https://serpapi.com/search', {
       params: {
         q: domain,
-        api_key: SERP_API_KEY,
+        api_key: apiKey,
         engine: 'google',
       },
     });
 
-    const organicResults = response.data.organic_results || [];
+    const organicResults = (response.data.organic_results || []) as SerpOrganicResult[];
     const keywords = organicResults
-      .filter((r: any) => r.position <= 50)
-      .map((r: any) => ({
+      .filter((r) => typeof r.position === 'number' && r.position <= 50)
+      .map((r) => ({
         keyword: r.title || r.snippet,
         volume: Math.floor(Math.random() * 10000),
         difficulty: Math.floor(Math.random() * 100),

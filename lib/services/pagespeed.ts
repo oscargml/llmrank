@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const PAGE_SPEED_API_KEY = process.env.PAGE_SPEED_API_KEY;
-
 export async function analyzePageSpeed(url: string) {
-  if (!PAGE_SPEED_API_KEY) {
+  const apiKey = process.env.PAGE_SPEED_API_KEY;
+
+  if (!apiKey) {
     return getDefaultPageSpeed();
   }
 
@@ -11,7 +11,7 @@ export async function analyzePageSpeed(url: string) {
     const response = await axios.get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', {
       params: {
         url: url,
-        key: PAGE_SPEED_API_KEY,
+        key: apiKey,
         category: ['performance', 'accessibility', 'best-practices', 'seo'],
       },
     });
@@ -20,7 +20,7 @@ export async function analyzePageSpeed(url: string) {
 
     return {
       pageSpeed: Math.round(lighthouseResult.categories.performance.score * 100),
-      mobileUsability: Math.round(lighthouseResult.categories.mobile.score * 100) || 85,
+      mobileUsability: Math.round(lighthouseResult.categories.performance.score * 100),
       accessibility: Math.round(lighthouseResult.categories.accessibility.score * 100),
       seo: Math.round(lighthouseResult.categories.seo.score * 100),
       bestPractices: Math.round(lighthouseResult.categories['best-practices'].score * 100),

@@ -1,16 +1,21 @@
 import axios from 'axios';
 
-const WAPPALYZER_API_KEY = process.env.WAPPALYZER_API_KEY;
+type WappalyzerTechnology = {
+  name?: string;
+  categories?: string[];
+};
 
 export async function analyzeTechStack(url: string) {
-  if (!WAPPALYZER_API_KEY) {
+  const apiKey = process.env.WAPPALYZER_API_KEY;
+
+  if (!apiKey) {
     return getDefaultTechStack();
   }
 
   try {
     const response = await axios.get(
       `https://api.wappalyzer.com/v2/lookup?urls=${encodeURIComponent(url)}`,
-      { headers: { 'x-api-key': WAPPALYZER_API_KEY } }
+      { headers: { 'x-api-key': apiKey } }
     );
 
     const tech = response.data?.[0]?.technologies || [];
@@ -24,9 +29,10 @@ export async function analyzeTechStack(url: string) {
       performance: [],
     };
 
-    tech.forEach((t: any) => {
+    tech.forEach((t: WappalyzerTechnology) => {
       const name = t.name;
       const category = t.categories?.[0]?.toLowerCase() || 'frontend';
+      if (!name) return;
       if (categories[category]) {
         categories[category].push(name);
       } else {

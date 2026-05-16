@@ -1,10 +1,12 @@
 import axios from 'axios';
-
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+import { DEFAULT_ANTHROPIC_MODEL } from './config';
 
 export async function analyzeLLMMetrics(url: string, contentSample?: string) {
-  if (!ANTHROPIC_API_KEY) {
-    return getDefaultLLMMetrics();
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const model = process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
+
+  if (!apiKey) {
+    return getDefaultLLMMetrics('missing_anthropic_api_key');
   }
 
   try {
@@ -28,7 +30,7 @@ Respond with ONLY this JSON format (no markdown, no other text):
     const response = await axios.post(
       'https://api.anthropic.com/v1/messages',
       {
-        model: 'claude-opus-4-7',
+        model,
         max_tokens: 200,
         messages: [
           {
@@ -39,7 +41,7 @@ Respond with ONLY this JSON format (no markdown, no other text):
       },
       {
         headers: {
-          'x-api-key': ANTHROPIC_API_KEY,
+          'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
           'content-type': 'application/json',
         },
@@ -50,8 +52,9 @@ Respond with ONLY this JSON format (no markdown, no other text):
     console.log('Claude response:', text);
     return parseMetricsFromResponse(text);
   } catch (error) {
-    console.error('Anthropic error:', error instanceof Error ? error.message : error);
-    return getDefaultLLMMetrics();
+    const reason = getAnthropicErrorReason(error);
+    console.error('Anthropic error:', reason);
+    return getDefaultLLMMetrics(reason);
   }
 }
 
@@ -70,7 +73,7 @@ async function fetchPageContent(url: string): Promise<string> {
 }
 
 function parseMetricsFromResponse(text: string) {
-  const defaultMetrics = getDefaultLLMMetrics();
+  const defaultMetrics = getDefaultLLMMetrics('invalid_anthropic_response');
 
   try {
     const scores = extractScores(text);
@@ -78,6 +81,7 @@ function parseMetricsFromResponse(text: string) {
     const overallScore = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
 
     return {
+      source: 'anthropic',
       overallScore: Math.min(100, Math.max(0, overallScore)),
       components: [
         { name: 'LLM Content Friendliness', value: scores.content_friendliness },
@@ -124,8 +128,10 @@ function extractScores(text: string): { [key: string]: number } {
   return defaults;
 }
 
-function getDefaultLLMMetrics() {
+function getDefaultLLMMetrics(reason: string) {
   return {
+    source: 'fallback',
+    fallbackReason: reason,
     overallScore: 78,
     components: [
       { name: 'LLM Content Friendliness', value: 85 },
@@ -136,4 +142,22 @@ function getDefaultLLMMetrics() {
       { name: 'Citation Worthiness', value: 73 },
     ],
   };
+}
+
+function getAnthropicErrorReason(error: unknown) {
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+    const apiError = error.response?.data?.error;
+    const message = apiError?.message || error.message;
+
+    if (status === 401) return 'anthropic_auth_failed_check_api_key';
+    if (status === 403) return 'anthropic_forbidden_check_workspace_or_model_access';
+    if (status === 404) return 'anthropic_model_not_found_check_anthropic_model';
+    if (status === 429) return 'anthropic_rate_limited_or_no_credits';
+    if (status) return `anthropic_http_${status}: ${message}`;
+
+    return `anthropic_network_error: ${message}`;
+  }
+
+  return error instanceof Error ? error.message : 'unknown_anthropic_error';
 }

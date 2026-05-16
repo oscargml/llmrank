@@ -3,7 +3,23 @@ import { analyzeTechStack } from '@/lib/services/wappalyzer';
 import { analyzePageSpeed } from '@/lib/services/pagespeed';
 import { analyzeSERPPositions } from '@/lib/services/serpapi';
 import { analyzeLLMMetrics } from '@/lib/services/llm-analysis';
-import axios from 'axios';
+import { getApiKeyStatus } from '@/lib/services/config';
+
+type ScoreComponent = {
+  name: string;
+  value: number;
+};
+
+type LLMMetrics = {
+  source: string;
+  fallbackReason?: string;
+  overallScore: number;
+  components: ScoreComponent[];
+};
+
+export async function GET() {
+  return NextResponse.json({ apiStatus: getApiKeyStatus() });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,13 +30,13 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
+    const parsedUrl = new URL(normalizedUrl);
 
     const [techStack, pageSpeed, keywords, llmMetrics] = await Promise.all([
       analyzeTechStack(normalizedUrl),
       analyzePageSpeed(normalizedUrl),
       analyzeSERPPositions(normalizedUrl),
       analyzeLLMMetrics(normalizedUrl),
-      fetchPageContent(normalizedUrl).catch(() => null),
     ]);
 
     const urlAnalysisData = [
@@ -33,7 +49,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       url: normalizedUrl,
-      domain: new URL(normalizedUrl).hostname,
+      domain: parsedUrl.hostname,
+      apiStatus: getApiKeyStatus(),
       aiMetrics: llmMetrics,
       techStack,
       keywords,
@@ -51,17 +68,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function fetchPageContent(url: string): Promise<string> {
-  try {
-    const response = await axios.get(url, { timeout: 5000 });
-    const text = response.data;
-    return text.substring(0, 2000);
-  } catch {
-    return '';
-  }
-}
-
-function generateCompetitorComparison(llmMetrics: any) {
+function generateCompetitorComparison(llmMetrics: LLMMetrics) {
   const yourScore = llmMetrics.overallScore;
   return [
     {
@@ -100,7 +107,7 @@ function generateCompetitorComparison(llmMetrics: any) {
   ];
 }
 
-function generateTrendData(llmMetrics: any) {
+function generateTrendData(llmMetrics: LLMMetrics) {
   const baseScore = llmMetrics.overallScore;
   return [
     { month: 'Jan', score: baseScore - 16, citationQuality: baseScore - 15, semanticClarity: baseScore - 17, trainingValue: baseScore - 18 },
@@ -112,7 +119,7 @@ function generateTrendData(llmMetrics: any) {
   ];
 }
 
-function generateRankingGuidance(llmMetrics: any) {
+function generateRankingGuidance(llmMetrics: LLMMetrics) {
   const overallScore = llmMetrics.overallScore;
   return [
     { metric: 'Semantic Coherence', current: overallScore - 17, target: 95, action: 'Improve topic clustering; use entity linking' },

@@ -1,8 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, AreaChart, Area } from 'recharts';
 import { Zap, Code, Lightbulb, TrendingUp, Shield, Cpu, Globe, GitBranch, Settings, Download, Plus, X, ArrowRight, Loader } from 'lucide-react';
+
+const getScoreColor = (score) => {
+  if (score >= 80) return 'text-green-500';
+  if (score >= 60) return 'text-amber-500';
+  return 'text-red-500';
+};
+
+const ScoreCard = ({ title, score, icon: Icon, subtitle }) => (
+  <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-6 border border-slate-700 hover:border-cyan-500/50 transition-all">
+    <div className="flex items-start justify-between mb-4">
+      <div>
+        <p className="text-slate-400 text-sm font-medium">{title}</p>
+        {subtitle && <p className="text-slate-500 text-xs mt-1">{subtitle}</p>}
+      </div>
+      <Icon className="w-5 h-5 text-cyan-400" />
+    </div>
+    <div className="text-4xl font-bold tracking-tight">
+      <span className={getScoreColor(score)}>{score}</span>
+      <span className="text-2xl text-slate-500 ml-2">/100</span>
+    </div>
+    <div className="mt-4 h-2 bg-slate-700 rounded-full overflow-hidden">
+      <div
+        className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500"
+        style={{ width: `${score}%` }}
+      />
+    </div>
+  </div>
+);
 
 const LLMRank = () => {
   const [url, setUrl] = useState('');
@@ -12,13 +40,7 @@ const LLMRank = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('ai-metrics');
   const [showAPIPanel, setShowAPIPanel] = useState(false);
-  const [apiKeys, setApiKeys] = useState({
-    wappalyzer: '',
-    semrush: '',
-    serpapi: '',
-    pageSpeed: '',
-    anthropic: '',
-  });
+  const [apiStatus, setApiStatus] = useState(null);
 
   const [analysisData, setAnalysisData] = useState({
     url: '',
@@ -31,6 +53,33 @@ const LLMRank = () => {
     trendData: [],
     rankingGuidance: [],
   });
+
+  const loadApiStatus = async () => {
+    try {
+      const response = await fetch('/api/analyze');
+      const data = await response.json();
+      setApiStatus(data.apiStatus);
+    } catch {
+      setApiStatus(null);
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    fetch('/api/analyze')
+      .then((response) => response.json())
+      .then((data) => {
+        if (active) setApiStatus(data.apiStatus);
+      })
+      .catch(() => {
+        if (active) setApiStatus(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const analyzeURL = async (urlInput) => {
     if (!urlInput.trim()) return;
@@ -51,6 +100,7 @@ const LLMRank = () => {
 
       const data = await response.json();
       setAnalysisData(data);
+      setApiStatus(data.apiStatus || null);
       setAnalyzed(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -72,34 +122,6 @@ const LLMRank = () => {
     updated[idx] = value;
     setCompetitors(updated);
   };
-
-  const getScoreColor = (score) => {
-    if (score >= 80) return 'text-green-500';
-    if (score >= 60) return 'text-amber-500';
-    return 'text-red-500';
-  };
-
-  const ScoreCard = ({ title, score, icon: Icon, subtitle }) => (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-6 border border-slate-700 hover:border-cyan-500/50 transition-all">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <p className="text-slate-400 text-sm font-medium">{title}</p>
-          {subtitle && <p className="text-slate-500 text-xs mt-1">{subtitle}</p>}
-        </div>
-        <Icon className="w-5 h-5 text-cyan-400" />
-      </div>
-      <div className="text-4xl font-bold tracking-tight">
-        <span className={getScoreColor(score)}>{score}</span>
-        <span className="text-2xl text-slate-500 ml-2">/100</span>
-      </div>
-      <div className="mt-4 h-2 bg-slate-700 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500"
-          style={{ width: `${score}%` }}
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-slate-950 text-white overflow-hidden">
@@ -191,33 +213,50 @@ const LLMRank = () => {
             )}
           </div>
 
-          {showAPIPanel && (
+            {showAPIPanel && (
             <div className="border-t border-slate-800 bg-slate-900/50">
               <div className="max-w-7xl mx-auto px-6 py-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries(apiKeys).map(([key, value]) => (
-                    <div key={key}>
-                      <label className="text-xs text-slate-400 block mb-1 uppercase">{key.replace(/([A-Z])/g, ' $1')}</label>
-                      <input
-                        type="password"
-                        placeholder="Enter API Key"
-                        value={value}
-                        onChange={(e) => setApiKeys({...apiKeys, [key]: e.target.value})}
-                        className="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500"
-                      />
-                      <p className="text-xs text-slate-500 mt-1">
-                        {key === 'wappalyzer' && 'For tech stack detection'}
-                        {key === 'semrush' && 'For SEO metrics & keywords'}
-                        {key === 'serpapi' && 'For SERP position tracking'}
-                        {key === 'pageSpeed' && 'For Core Web Vitals'}
-                        {key === 'anthropic' && 'For LLM-powered analysis'}
-                      </p>
-                    </div>
-                  ))}
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div>
+                    <h2 className="text-sm font-bold uppercase tracking-wider text-slate-300">Server API configuration</h2>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Keys are loaded from <span className="font-mono">.env.local</span> locally or Vercel Environment Variables in production.
+                    </p>
+                  </div>
+                  <button
+                    onClick={loadApiStatus}
+                    className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm transition-all"
+                  >
+                    Refresh
+                  </button>
                 </div>
-                <button className="mt-4 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded transition-all">
-                  Test Connections
-                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    ['anthropic', 'ANTHROPIC_API_KEY', 'Required for real LLM-powered analysis'],
+                    ['pageSpeed', 'PAGE_SPEED_API_KEY', 'Optional for Core Web Vitals'],
+                    ['serpApi', 'SERP_API_KEY', 'Optional for SERP position tracking'],
+                    ['wappalyzer', 'WAPPALYZER_API_KEY', 'Optional for tech stack detection'],
+                    ['semrush', 'SEMRUSH_API_KEY', 'Optional; reserved for SEO metrics'],
+                  ].map(([key, envName, description]) => {
+                    const configured = Boolean(apiStatus?.[key]);
+                    return (
+                    <div key={key} className="bg-slate-800/60 border border-slate-700 rounded-lg p-4">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="text-xs text-slate-300 font-mono">{envName}</span>
+                        <span className={`text-xs px-2 py-1 rounded ${configured ? 'bg-green-500/15 text-green-300' : 'bg-amber-500/15 text-amber-300'}`}>
+                          {configured ? 'Configured' : 'Missing'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500">{description}</p>
+                    </div>
+                    );
+                  })}
+                </div>
+                {apiStatus?.anthropicModel && (
+                  <p className="text-xs text-slate-500 mt-4">
+                    Anthropic model: <span className="font-mono text-slate-300">{apiStatus.anthropicModel}</span>
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -261,6 +300,22 @@ const LLMRank = () => {
                     <h2 className="text-2xl font-bold mb-2">LLM Content Metrics</h2>
                     <p className="text-slate-400 text-sm">How LLMs perceive your content quality, training value, and retrievability</p>
                   </div>
+
+                  {analysisData.aiMetrics.source === 'fallback' && (
+                    <div className="bg-amber-500/10 border border-amber-500/40 rounded-lg p-4">
+                      <p className="text-amber-200 text-sm font-semibold">Using fallback/demo LLM scores</p>
+                      <p className="text-amber-100/80 text-sm mt-1">
+                        Anthropic did not return a usable analysis. Reason: <span className="font-mono">{analysisData.aiMetrics.fallbackReason || 'unknown'}</span>
+                      </p>
+                    </div>
+                  )}
+
+                  {analysisData.aiMetrics.source === 'anthropic' && (
+                    <div className="bg-green-500/10 border border-green-500/40 rounded-lg p-4">
+                      <p className="text-green-200 text-sm font-semibold">Live Anthropic analysis</p>
+                      <p className="text-green-100/80 text-sm mt-1">These LLM scores came from the configured Anthropic API key.</p>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <ScoreCard

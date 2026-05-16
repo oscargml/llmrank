@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import LLMRank from './components/LLMRank';
-import { ChevronDown, ArrowRight, Zap, Brain, BarChart3, Globe } from 'lucide-react';
+import { ChevronDown, ArrowRight } from 'lucide-react';
 
 export default function Home() {
   const [showTool, setShowTool] = useState(false);
@@ -204,7 +204,7 @@ export default function Home() {
             <div className="text-2xl font-bold text-cyan-400 w-12 h-12 flex items-center justify-center bg-cyan-500/20 rounded">2</div>
             <div>
               <h3 className="font-bold mb-2">Add Your API Keys (Optional)</h3>
-              <p className="text-slate-400 text-sm">Get free API keys from Anthropic, Google, SerpAPI. Instructions shown in the app. Without keys, you'll see estimated metrics.</p>
+              <p className="text-slate-400 text-sm">Get free API keys from Anthropic, Google, SerpAPI. Configure them in .env.local locally or in Vercel Environment Variables. Without keys, you will see estimated metrics.</p>
             </div>
           </div>
 
